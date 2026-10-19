@@ -1,0 +1,58 @@
+name: NOVA CRAFT Server
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "start = full runtime cycle, snapshot = archive the saved world only"
+        type: choice
+        options: [start, snapshot]
+        default: start
+      restore_tag:
+        description: "Optional backup release tag to restore before starting (empty = newest)"
+        type: string
+        default: ""
+concurrency:
+  group: novacraft-server-mvei7orb2f839s
+  cancel-in-progress: false
+permissions:
+  contents: write
+  actions: write
+jobs:
+  server:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read server configuration
+        id: cfg
+        run: python3 nova-craft/config.py
+
+      - uses: actions/setup-java@v4
+        if: steps.cfg.outputs.edition == 'JAVA'
+        with:
+          distribution: temurin
+          java-version: ${{ steps.cfg.outputs.javamajor }}
+
+      - name: Restore persisted server data
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ steps.cfg.outputs.data }}
+          key: novacraft-data-${{ steps.cfg.outputs.sid }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            novacraft-data-${{ steps.cfg.outputs.sid }}-
+
+      - name: Run server cycle
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PLAYIT_SECRET_KEY: ${{ secrets.PLAYIT_SECRET_KEY }}
+          NOVA_ACTION: ${{ inputs.action }}
+          NOVA_RESTORE_TAG: ${{ inputs.restore_tag }}
+        run: bash nova-craft/runner.sh
+
+      - name: Save persisted server data
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ steps.cfg.outputs.data }}
+          key: novacraft-data-${{ steps.cfg.outputs.sid }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.run_number }}
