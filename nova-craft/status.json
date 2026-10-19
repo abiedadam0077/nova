@@ -9,7 +9,7 @@
   "version": "1.21.10",
   "serverPid": 2398,
   "tunnelStatus": "not_created",
-  "tunnelMessage": "No matching Playit Tunnel was reported. Create one manually in the Playit dashboard; NOVA CRAFT does not create it.",
+  "tunnelMessage": "No matching Playit Tunnel was reported. Create one manually in the Playit dashboard.",
   "tunnelDiagnostic": "not_created",
   "tunnelAddress": "",
   "tunnelName": "",
@@ -29,7 +29,7 @@
   "fileManifestStatus": "published",
   "fileSnapshotStatus": "published",
   "latencyMs": null,
-  "updatedAt": "2026-10-19T00:19:42Z",
+  "updatedAt": "2026-10-19T00:20:14Z",
   "cycleStartedAt": "2026-10-19T00:19:05Z",
   "conclusion": ""
 }
